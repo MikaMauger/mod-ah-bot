@@ -271,7 +271,9 @@ VALUES
 (3525), -- Unused Black Night Elf Bracers
 (3528), -- Red Leather C03 Breastplate
 (3532), -- Unused Red Leather C03 Pants
+(3533), -- Red Leather C03 Boots
 (3534), -- Unused Red Leather C03 Gloves
+(3535), -- Red Leather C03 Bracers
 (3536), -- Demon Hunter Blindfold
 (3537), -- Black Leather D02 Breastplate
 (3539), -- Unused Black Leather D02 Pants

@@ -139,7 +139,7 @@ void AuctionHouseBot::addNewAuctions(Player* AHBplayer, AHBConfig* config)
         return;
     }
 
-    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntry(config->GetAHFID());
+    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromFactionTemplate(config->GetAHFID());
     if (!ahEntry)
     {
         return;
@@ -405,7 +405,7 @@ void AuctionHouseBot::addNewAuctions(Player* AHBplayer, AHBConfig* config)
 
             auto* auctionEntry = new AuctionEntry();
             auctionEntry->Id = sObjectMgr->GenerateAuctionID();
-            auctionEntry->houseId = config->GetAHID();
+            auctionEntry->houseId = AuctionHouseId(config->GetAHID());
             auctionEntry->item_guid = item->GetGUID();
             auctionEntry->item_template = item->GetEntry();
             auctionEntry->itemCount = item->GetCount();
@@ -742,7 +742,7 @@ void AuctionHouseBot::Update()
 
     std::string accountName = "AuctionHouseBot" + std::to_string(AHBplayerAccount);
 
-    WorldSession _session(AHBplayerAccount, std::move(accountName), nullptr, SEC_PLAYER, sWorld->getIntConfig(CONFIG_EXPANSION), 0, LOCALE_enUS, 0, false,
+    WorldSession _session(AHBplayerAccount, std::move(accountName), 0, nullptr, SEC_PLAYER, sWorld->getIntConfig(CONFIG_EXPANSION), 0, LOCALE_enUS, 0, false,
                           false, 0);
     Player _AHBplayer(&_session);
     _AHBplayer.Initialize(AHBplayerGUID);
@@ -881,7 +881,7 @@ void AuctionHouseBot::Initialize()
                     if (!Bind_When_Picked_Up)
                         continue;
                     break;
-                case BIND_WHEN_EQUIPED:
+                case BIND_WHEN_EQUIPPED:
                     if (!Bind_When_Equipped)
                         continue;
                     break;
@@ -1496,18 +1496,18 @@ void AuctionHouseBot::IncrementItemCounts(AuctionEntry* ah)
 
     AHBConfig* config;
 
-    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(ah->GetHouseId());
+    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry((uint32)ah->GetHouseId());
     if (!ahEntry)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Neutral", ah->GetHouseId());
         config = &NeutralConfig;
-    } else if (ahEntry->houseId == AUCTIONHOUSE_ALLIANCE)
+    } else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Alliance", ah->GetHouseId());
         config = &AllianceConfig;
-    } else if (ahEntry->houseId == AUCTIONHOUSE_HORDE)
+    } else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Horde", ah->GetHouseId());
@@ -1529,18 +1529,18 @@ void AuctionHouseBot::DecrementItemCounts(AuctionEntry* ah, uint32 itemEntry)
 
     AHBConfig* config;
 
-    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(ah->GetHouseId());
+    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(ah->GetHouseId());
     if (!ahEntry)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Neutral", ah->GetHouseId());
         config = &NeutralConfig;
-    } else if (ahEntry->houseId == AUCTIONHOUSE_ALLIANCE)
+    } else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Alliance", ah->GetHouseId());
         config = &AllianceConfig;
-    } else if (ahEntry->houseId == AUCTIONHOUSE_HORDE)
+    } else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
     {
         if (debug_Out)
             LOG_ERROR("module", "AHBot: {} returned as House Faction. Horde", ah->GetHouseId());
